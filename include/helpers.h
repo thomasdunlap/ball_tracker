@@ -11,7 +11,25 @@
 using namespace std;
 using namespace cv;
 
+/**
+ * @brief 
+ *
+ * @param imgDil
+ * @param img
+ * @param x
+ * @param y
+ *
+ * @return 
+ */
 bool getContours(Mat imgDil, Mat img, int &x, int &y);
+
+/**
+ * @brief 
+ *
+ * @param src
+ * @param ballX
+ * @param ballY
+ */
 void quadrant(Mat src, int ballX, int ballY);
 
 #ifdef ENABLE_DOCTEST_IN_LIBRARY

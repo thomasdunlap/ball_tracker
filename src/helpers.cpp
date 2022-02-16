@@ -11,48 +11,67 @@
 using namespace std;
 using namespace cv;
 
+
+/**
+ * @brief 
+ *
+ * @param imgDil
+ * @param img
+ * @param x
+ * @param y
+ *
+ * @return 
+ */
 bool getContours(Mat imgDil, Mat img, int &x, int &y) {
 
-	vector<vector<Point>> contours;
-	vector<Vec4i> hierarchy;
+    vector<vector<Point>> contours;
+    vector<Vec4i> hierarchy;
 
-	findContours(imgDil, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-	vector<vector<Point>> conPoly(contours.size());
-	vector<Rect> boundRect(contours.size());
-	vector<Point2f> centers( contours.size() );
-	vector<float> radius( contours.size() );
-	long unsigned int i; 
-	for (i = 0; i < contours.size(); i++)
-	{
-		int area = contourArea(contours[i]);
-		//cout << area << endl;
-		string objectType;
+    findContours(imgDil, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    vector<vector<Point>> conPoly(contours.size());
+    vector<Rect> boundRect(contours.size());
+    vector<Point2f> centers( contours.size() );
+    vector<float> radius( contours.size() );
+    long unsigned int i; 
+    for (i = 0; i < contours.size(); i++)
+    {
+        int area = contourArea(contours[i]);
+        //cout << area << endl;
+        string objectType;
 
-		if (area > 1000) 
-		{
-			float peri = arcLength(contours[i], true);
-			approxPolyDP(contours[i], conPoly[i], 0.02 * peri, true);
-			//cout << conPoly[i].size() << endl;
-			boundRect[i] = boundingRect(conPoly[i]);
-			minEnclosingCircle( conPoly[i], centers[i], radius[i] );
-		
-			int objCor = (int)conPoly[i].size();
+        if (area > 1000) 
+        {
+            float peri = arcLength(contours[i], true);
+            approxPolyDP(contours[i], conPoly[i], 0.02 * peri, true);
+            //cout << conPoly[i].size() << endl;
+            boundRect[i] = boundingRect(conPoly[i]);
+            minEnclosingCircle( conPoly[i], centers[i], radius[i] );
+        
+            int objCor = (int)conPoly[i].size();
 
-			objectType = "Tennis Ball"; 
+            objectType = "Tennis Ball"; 
 
-			//drawContours(img, conPoly, i, Scalar(255, 0, 255), 2);
+            //drawContours(img, conPoly, i, Scalar(255, 0, 255), 2);
             x = (int)centers[i].x;
             y = (int)centers[i].y;
             
-			circle(img, centers[i], 3, Scalar(0,100,100), 3, LINE_AA);
-			rectangle(img, boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 5);
-			putText(img, objectType, { boundRect[i].x,boundRect[i].y - 5 }, FONT_HERSHEY_PLAIN,1, Scalar(0, 69, 255), 2);
-			return true;            
-		}
-	}
+            circle(img, centers[i], 3, Scalar(0,100,100), 3, LINE_AA);
+            rectangle(img, boundRect[i].tl(), boundRect[i].br(), Scalar(0, 255, 0), 5);
+            putText(img, objectType, { boundRect[i].x,boundRect[i].y - 5 }, FONT_HERSHEY_PLAIN,1, Scalar(0, 69, 255), 2);
+            return true;            
+        }
+    }
     return false;
 }
 
+
+/**
+ * @brief 
+ *
+ * @param src
+ * @param ballX
+ * @param ballY
+ */
 void quadrant(Mat src, int ballX, int ballY)
 {
     Mat imgDil, imgErode, gradX, imgHSV, absGradX, thr;
@@ -84,26 +103,26 @@ void quadrant(Mat src, int ballX, int ballY)
 
 
         if (abs(x2 - x1) > length) {
-	        float m = (float)(y2 - y1) / (float)(x2 - x1);
+            float m = (float)(y2 - y1) / (float)(x2 - x1);
             if (m >= 0) { // handle zero later
-	    	    mPos = m;
-		        bPos = y1 - m*x1;
-		
-	        }
+                mPos = m;
+                bPos = y1 - m*x1;
         
-	        else {
-	            mNeg = m;
-		        bNeg = y1 - m*x1;
-		
-	        }
+            }
+        
+            else {
+                mNeg = m;
+                bNeg = y1 - m*x1;
+        
+            }
             line(src, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 1, LINE_AA);
         }
 
-	    if (mPos >= 0 && mNeg < 0) {
-	        //cout << mPos << "x + " << bPos << "\n" << endl;
-	        //cout << mNeg << "x + " << bNeg << "\n" << endl; 
-	        break;
-	    }
+        if (mPos >= 0 && mNeg < 0) {
+            //cout << mPos << "x + " << bPos << "\n" << endl;
+            //cout << mNeg << "x + " << bNeg << "\n" << endl; 
+            break;
+        }
     }
     int negY = mNeg * ballX + bNeg;
     int posY = mPos * ballX + bPos;
