@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+    focal-cuda-opencv:
+        image: focal-cuda-opencv
+        container_name: focal-cuda-opencv
+        build: 
+            context: .
+            dockerfile: docker/Dockerfile
+        init: true
+        volumes:
+            - /tmp/.X11-unix:/tmp/.X11-unix
+            - .:/home
+        environment:
+            - DISPLAY=$DISPLAY
+        network_mode: "host"
+        ipc: host
+        privileged: true
+        devices:
+            - /dev/video0
+            - /dev/video1
+        command: ["./build/main","RollingTennisBall.mov"]

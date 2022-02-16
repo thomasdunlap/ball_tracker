@@ -1,5 +1,4 @@
-# Temporary ignore
-*.yml
+.vscode
 
 # Media Files for test
 *.mov
